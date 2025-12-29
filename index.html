@@ -3,28 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Material 3 To-Do</title>
+    <title>Material 3 Task Manager</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="theme-container">
-        <button id="theme-toggle" class="hover-el">🌓 Mode</button>
+    <div class="theme-container hover-el">
+        <button id="theme-toggle">🌓 Toggle Mode</button>
     </div>
 
-    <div class="todo-card">
-        <header>
-            <h1>My Tasks</h1>
-        </header>
+    <div class="container">
+        <div class="todo-card">
+            <header>
+                <h1>My Tasks</h1>
+            </header>
 
-        <div class="input-group">
-            <input type="text" id="todo-input" placeholder="Add a new task..." class="hover-el">
-            <button id="add-btn" class="hover-el">Add</button>
+            <div class="input-group">
+                <input type="text" id="todo-input" placeholder="What's on your mind?" class="hover-el">
+                <button id="add-btn" class="hover-el">Add</button>
+            </div>
+
+            <ul id="todo-list">
+                </ul>
         </div>
 
-        <ul id="todo-list">
-            </ul>
+        <div class="history-card">
+            <header>
+                <h2>📜 History</h2>
+                <button id="clear-history" class="hover-el">Clear All</button>
+            </header>
+            <ul id="history-list">
+                </ul>
+        </div>
     </div>
 
     <script src="script.js"></script>
