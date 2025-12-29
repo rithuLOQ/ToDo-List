@@ -1,137 +1,168 @@
 :root {
+    /* M3 Color Palette & Gradients */
     --bg-gradient: linear-gradient(135deg, #cfbefd, #adeaef);
     --card-bg: #ffffff;
     --text-color: #1c1b1f;
     --primary: #6750a4;
-    --shadow: 0 2px 4px rgba(0,0,0,0.1);
-    --hover-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --secondary: #e8def8;
+    --accent-green: #32a852;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+    --hover-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    --active-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Dark Mode Overrides */
 [data-theme="dark"] {
-    --bg-gradient: linear-gradient(135deg, #2a2438, #2c3e50);
-    --card-bg: #1c1b1f;
+    --bg-gradient: linear-gradient(135deg, #1d1b20, #2a2438);
+    --card-bg: #2b2930;
     --text-color: #e6e1e5;
     --primary: #d0bcff;
-    --shadow: 0 2px 4px rgba(0,0,0,0.5);
+    --secondary: #4f378b;
+    --accent-green: #81c784;
+    --shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
 body {
     margin: 0;
-    padding: 0;
     font-family: 'Roboto', sans-serif;
     background: var(--bg-gradient);
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    padding: 100px 20px 40px;
+    transition: background 0.5s ease;
+}
+
+/* Theme Toggle Box */
+.theme-container {
+    position: fixed;
+    top: 25px;
+    left: 25px;
+    background: var(--card-bg);
+    padding: 4px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+}
+
+#theme-toggle {
+    background: transparent;
+    color: var(--text-color);
+    border: none;
+    padding: 10px 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 24px; }
+
+/* Material 3 Cards */
+.todo-card, .history-card {
+    background: var(--card-bg);
+    padding: 28px;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    color: var(--text-color);
     transition: var(--transition);
 }
 
-/* Theme Toggle Position */
-.theme-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-}
+.history-card { opacity: 0.9; }
+.history-card header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-/* Common Hover Effect for Boxes/Ovals */
+/* Universal Hover & Press Effects */
 .hover-el {
     transition: var(--transition);
-    border: none;
-    outline: none;
+    cursor: pointer;
 }
 
 .hover-el:hover {
     transform: translateY(-4px);
     box-shadow: var(--hover-shadow);
-    cursor: pointer;
 }
 
-/* Main Card */
-.todo-card {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 28px; /* Material 3 Extra Large */
-    box-shadow: var(--shadow);
-    width: 90%;
-    max-width: 400px;
-    color: var(--text-color);
+.hover-el:active {
+    transform: translateY(1px) scale(0.97); /* Pressing effect */
+    box-shadow: var(--active-shadow);
+    filter: brightness(0.95);
 }
 
-.input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-input {
+/* Inputs & Buttons */
+.input-group { display: flex; gap: 12px; margin: 20px 0; }
+input[type="text"] {
     flex: 1;
-    padding: 12px 20px;
-    border-radius: 12px;
-    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 16px;
     border: 1px solid #79747e;
+    background: transparent;
     color: var(--text-color);
+    outline: none;
 }
 
-#add-btn, #theme-toggle {
-    background-color: var(--primary);
+#add-btn {
+    background: var(--primary);
     color: white;
-    padding: 12px 20px;
-    border-radius: 100px; /* Oval/Pill shape */
+    border: none;
+    padding: 0 24px;
+    border-radius: 16px;
     font-weight: 500;
 }
 
-[data-theme="dark"] #theme-toggle {
-    color: #1c1b1f;
-}
-
-/* List Styling */
-ul {
-    list-style: none;
-    padding: 0;
-}
-
+/* List Item Styling */
+ul { list-style: none; padding: 0; margin: 0; }
 li {
     background: var(--card-bg);
-    margin-bottom: 12px;
-    padding: 15px;
-    border-radius: 16px;
+    margin-bottom: 14px;
+    padding: 16px;
+    border-radius: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid rgba(0,0,0,0.05);
     box-shadow: var(--shadow);
 }
 
-.delete-btn {
-    background: #ffb4ab;
-    color: #690005;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 8px;
-    cursor: pointer;
+.item-left { display: flex; align-items: center; gap: 15px; flex: 1; }
+.actions { display: flex; gap: 10px; }
+
+/* Buttons inside List Items */
+.edit-btn, .delete-btn { border: none; padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.edit-btn { background: var(--secondary); color: var(--text-color); }
+.delete-btn { background: #ffb4ab; color: #690005; }
+
+/* Animated Checkbox */
+.checkbox-container {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-/* Styling for the new Edit Button */
-.edit-btn {
-    background: #d0bcff; /* Material 3 Light Purple */
-    color: #381e72;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-right: 8px;
-    font-size: 0.8rem;
+.checkbox-container input { display: none; }
+.checkmark-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--primary);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: var(--transition);
 }
-
-.edit-btn:hover {
-    background: #b69df8;
-    box-shadow: var(--shadow);
+.checkmark-svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--accent-green);
+    stroke-width: 4;
+    fill: none;
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    transition: 0.4s cubic-bezier(0.65, 0, 0.45, 1);
 }
+input:checked + .checkmark-box .checkmark-svg { stroke-dashoffset: 0; }
+input:checked + .checkmark-box { border-color: var(--accent-green); background: rgba(50, 168, 82, 0.1); }
 
-/* Container for task actions to keep buttons aligned */
-.actions {
-    display: flex;
-    gap: 4px;
-}
+.history-item { text-decoration: line-through; opacity: 0.6; }
+#clear-history { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 5px 12px; border-radius: 10px; font-size: 0.8rem; }
