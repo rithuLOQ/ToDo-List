@@ -1,129 +1,125 @@
-// DOM Element Selectors
+// Selecting DOM elements
 const addBtn = document.getElementById('add-btn');
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
-const historyList = document.getElementById('history-list');
 const themeToggle = document.getElementById('theme-toggle');
-const clearHistoryBtn = document.getElementById('clear-history');
+const htmlElement = document.documentElement;
 
-// 1. Initial Load from LocalStorage
-document.addEventListener('DOMContentLoaded', () => {
-    loadTheme();
-    renderTasks();
-    renderHistory();
-});
+// --- 1. Theme Management ---
 
-// 2. Theme Management Logic
+// Check for saved theme in localStorage
+const savedTheme = localStorage.getItem('theme') || 'light';
+htmlElement.setAttribute('data-theme', savedTheme);
+
 themeToggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const target = current === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', target);
-    localStorage.setItem('theme', target);
+    const currentTheme = htmlElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    htmlElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme); // Save preference
 });
 
-function loadTheme() {
-    const saved = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', saved);
-}
+// --- 2. Task Management Logic ---
 
-// 3. Task Logic (Add, Render, Edit, Delete)
-addBtn.addEventListener('click', addTask);
-todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addTask());
+// Load tasks from LocalStorage on startup
+document.addEventListener('DOMContentLoaded', getTasks);
+
+// Add Task Event
+addBtn.addEventListener('click', () => {
+    addTask();
+});
+
+// Add Task when pressing "Enter" key
+todoInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
 
 function addTask() {
-    const text = todoInput.value.trim();
-    if (!text) return;
-
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.push({ id: Date.now(), text: text });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    const taskText = todoInput.value.trim();
     
+    if (taskText === "") {
+        alert("Please enter a task! ✨");
+        return;
+    }
+
+    const taskObj = {
+        id: Date.now(),
+        text: taskText
+    };
+
+    createTaskElement(taskObj);
+    saveTaskToLocal(taskObj);
     todoInput.value = "";
-    renderTasks();
 }
 
-function renderTasks() {
-    todoList.innerHTML = "";
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+// Function to build the UI for a task
+function createTaskElement(taskObj) {
+    const li = document.createElement('li');
+    li.className = 'hover-el'; // Material 3 Hover Effect
+    li.setAttribute('data-id', taskObj.id);
     
-    tasks.forEach(task => {
-        const li = document.createElement('li');
-        li.className = 'hover-el';
-        li.innerHTML = `
-            <div class="item-left">
-                <label class="checkbox-container hover-el">
-                    <input type="checkbox" onchange="handleTaskCompletion('${task.id}')">
-                    <span class="checkmark-box">
-                        <svg class="checkmark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </span>
-                </label>
-                <span>${task.text}</span>
-            </div>
-            <div class="actions">
-                <button onclick="editTask(${task.id})" class="edit-btn hover-el">✏️</button>
-                <button onclick="deleteItem(${task.id}, 'tasks')" class="delete-btn hover-el">🗑️</button>
-            </div>
-        `;
-        todoList.appendChild(li);
+    li.innerHTML = `
+        <span class="task-content">${taskObj.text}</span>
+        <div class="actions">
+            <button class="edit-btn hover-el">Edit</button>
+            <button class="delete-btn hover-el">Delete</button>
+        </div>
+    `;
+    
+    todoList.appendChild(li);
+
+    // Event Listeners for Edit and Delete
+    const deleteBtn = li.querySelector('.delete-btn');
+    const editBtn = li.querySelector('.edit-btn');
+    const content = li.querySelector('.task-content');
+
+    // Delete Logic
+    deleteBtn.addEventListener('click', () => {
+        removeTaskFromLocal(taskObj.id);
+        li.style.opacity = '0';
+        li.style.transform = 'translateY(10px)';
+        setTimeout(() => li.remove(), 300);
+    });
+
+    // Edit Logic
+    editBtn.addEventListener('click', () => {
+        const currentText = content.innerText;
+        const newText = prompt("✏️ Edit your task:", currentText);
+        
+        if (newText !== null && newText.trim() !== "") {
+            const updatedText = newText.trim();
+            content.innerText = updatedText;
+            updateTaskInLocal(taskObj.id, updatedText);
+        }
     });
 }
 
-// 4. History Management
-function renderHistory() {
-    historyList.innerHTML = "";
-    const history = JSON.parse(localStorage.getItem('history')) || [];
-    
-    history.forEach(item => {
-        const li = document.createElement('li');
-        li.className = 'hover-el history-item';
-        li.innerHTML = `
-            <span>${item.text}</span>
-            <button onclick="deleteItem(${item.id}, 'history')" class="delete-btn hover-el">🗑️</button>
-        `;
-        historyList.appendChild(li);
-    });
+// --- 3. Local Storage Helpers ---
+
+function saveTaskToLocal(task) {
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.push(task);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Handlers
-window.handleTaskCompletion = (id) => {
-    // Animation delay so user sees the tick draw before it moves
-    setTimeout(() => {
-        let tasks = JSON.parse(localStorage.getItem('tasks'));
-        const index = tasks.findIndex(t => t.id == id);
-        const completedItem = tasks.splice(index, 1)[0];
-        
-        let history = JSON.parse(localStorage.getItem('history')) || [];
-        history.push(completedItem);
-        
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        localStorage.setItem('history', JSON.stringify(history));
-        
-        renderTasks();
-        renderHistory();
-    }, 400); 
-};
+function getTasks() {
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks.forEach(task => createTaskElement(task));
+}
 
-window.editTask = (id) => {
-    let tasks = JSON.parse(localStorage.getItem('tasks'));
-    const task = tasks.find(t => t.id == id);
-    const newText = prompt("Update your task:", task.text);
-    if (newText && newText.trim()) {
-        task.text = newText.trim();
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-        renderTasks();
-    }
-};
+function removeTaskFromLocal(id) {
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks = tasks.filter(task => task.id !== id);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
 
-window.deleteItem = (id, storageKey) => {
-    let items = JSON.parse(localStorage.getItem(storageKey));
-    items = items.filter(i => i.id != id);
-    localStorage.setItem(storageKey, JSON.stringify(items));
-    storageKey === 'tasks' ? renderTasks() : renderHistory();
-};
-
-clearHistoryBtn.addEventListener('click', () => {
-    if(confirm("Permanently delete all history items?")) {
-        localStorage.setItem('history', JSON.stringify([]));
-        renderHistory();
-    }
-});
+function updateTaskInLocal(id, newText) {
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    tasks = tasks.map(task => {
+        if (task.id === id) {
+            task.text = newText;
+        }
+        return task;
+    });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
