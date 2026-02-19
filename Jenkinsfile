@@ -1,32 +1,37 @@
 pipeline {
     agent any
 
-    // Task 2: Define Choice parameter with DEV, TEST, PROD
+    // Task 2: Define string parameter BUILD_NAME
     parameters {
-        choice(
-            name: 'ENVIRONMENT', 
-            choices: ['DEV', 'TEST', 'PROD'], 
-            description: 'Task 2: Select the target environment'
-        )
+        string(name: 'BUILD_NAME', defaultValue: 'Build_v1.0', description: 'Task 2: Enter the name of this build')
     }
 
     stages {
-        // Task 1: Checkout updated repository version
+        // Task 1: Checkout repository
         stage('Task 1: Checkout') {
             steps {
                 checkout scm
-                echo "Updated repository version checked out."
+                echo "Repository checkout complete."
             }
         }
 
-        // Task 3: Print selected environment in console
-        stage('Task 3: Display Environment') {
+        // Task 3: Create a file with BUILD_NAME as its content
+        stage('Task 3: Create Build File') {
             steps {
-                // This prints the choice selected by the user
-                echo "The selected environment is: ${params.ENVIRONMENT}"
-                
-                // Using a BAT command to show it in the shell output
-                bat "echo DEPLOYING TO ${params.ENVIRONMENT} MODE"
+                script {
+                    // This BAT command creates a file named 'build_info.txt' 
+                    // and writes the BUILD_NAME into it.
+                    bat "echo ${params.BUILD_NAME} > build_info.txt"
+                    
+                    echo "File 'build_info.txt' has been created with content: ${params.BUILD_NAME}"
+                }
+            }
+        }
+
+        stage('Verify File') {
+            steps {
+                // Let's verify the file was actually created and show its content
+                bat "type build_info.txt"
             }
         }
     }
