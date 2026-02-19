@@ -2,29 +2,32 @@ pipeline {
     agent any
 
     stages {
-        // Task 1: Checkout repository
         stage('Task 1: Checkout') {
             steps {
                 checkout scm
-                echo "Source code checked out successfully."
             }
         }
 
-        // Task 2: Create sample.txt file using BAT
-        stage('Task 2: Create File') {
+        // Task 2: Append new data to sample.txt
+        stage('Task 2: Append Data') {
             steps {
-                // The '>' symbol creates the file and writes the text into it
-                bat 'echo Hello, this is a sample file created by Jenkins > sample.txt'
-                echo "File 'sample.txt' has been created in the workspace."
+                // Check if file exists first, then append
+                // '>>' appends to the file, while '>' overwrites it
+                bat 'echo This is the first line. > sample.txt'
+                bat 'echo This is the second line added in Version 2. >> sample.txt'
+                bat 'echo This is the third line for testing. >> sample.txt'
+                echo "Data appended to sample.txt successfully."
             }
         }
 
-        // Task 3: Display file content in console
-        stage('Task 3: Display Content') {
+        // Task 3: Count number of lines in file
+        stage('Task 3: Count Lines') {
             steps {
-                // 'type' is the Windows command to read a file's content
-                echo "Reading content of sample.txt:"
-                bat 'type sample.txt'
+                script {
+                    echo "Counting lines in sample.txt..."
+                    // 'find /c /v ""' is the Windows trick to count lines in a file
+                    bat 'find /c /v "" sample.txt'
+                }
             }
         }
     }
