@@ -8,26 +8,29 @@ pipeline {
             }
         }
 
-        // Task 2: Append new data to sample.txt
-        stage('Task 2: Append Data') {
+        stage('Setup: Create File') {
             steps {
-                // Check if file exists first, then append
-                // '>>' appends to the file, while '>' overwrites it
-                bat 'echo This is the first line. > sample.txt'
-                bat 'echo This is the second line added in Version 2. >> sample.txt'
-                bat 'echo This is the third line for testing. >> sample.txt'
-                echo "Data appended to sample.txt successfully."
+                // Ensuring sample.txt exists before we try to rename it
+                bat 'echo Initial content > sample.txt'
+                echo "Created sample.txt for renaming."
             }
         }
 
-        // Task 3: Count number of lines in file
-        stage('Task 3: Count Lines') {
+        // Task 2: Rename sample.txt to newfile.txt
+        stage('Task 2: Rename File') {
             steps {
-                script {
-                    echo "Counting lines in sample.txt..."
-                    // 'find /c /v ""' is the Windows trick to count lines in a file
-                    bat 'find /c /v "" sample.txt'
-                }
+                // 'ren' is the Windows command for rename (old_name new_name)
+                bat 'ren sample.txt newfile.txt'
+                echo "File renamed from sample.txt to newfile.txt."
+            }
+        }
+
+        // Task 3: List all files to confirm rename operation
+        stage('Task 3: Confirm Rename') {
+            steps {
+                // 'dir' lists all files in the current workspace directory
+                echo "Listing files in workspace:"
+                bat 'dir'
             }
         }
     }
