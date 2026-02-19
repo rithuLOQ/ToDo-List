@@ -8,28 +8,28 @@ pipeline {
             }
         }
 
-        stage('Setup: Create File') {
+        stage('Setup: Ensure File Exists') {
             steps {
-                // Ensuring sample.txt exists before we try to rename it
-                bat 'echo Initial content > sample.txt'
-                echo "Created sample.txt for renaming."
+                // Creating the file again just in case it was deleted in previous runs
+                bat 'echo Cleaning up... > newfile.txt'
+                echo "Verified newfile.txt exists for deletion."
             }
         }
 
-        // Task 2: Rename sample.txt to newfile.txt
-        stage('Task 2: Rename File') {
+        // Task 2: Delete the file using BAT command
+        stage('Task 2: Delete File') {
             steps {
-                // 'ren' is the Windows command for rename (old_name new_name)
-                bat 'ren sample.txt newfile.txt'
-                echo "File renamed from sample.txt to newfile.txt."
+                // 'del' is the Windows command to delete a file
+                bat 'del newfile.txt'
+                echo "File newfile.txt has been deleted."
             }
         }
 
-        // Task 3: List all files to confirm rename operation
-        stage('Task 3: Confirm Rename') {
+        // Task 3: Confirm deletion using directory listing
+        stage('Task 3: Confirm Deletion') {
             steps {
-                // 'dir' lists all files in the current workspace directory
-                echo "Listing files in workspace:"
+                echo "Checking workspace for newfile.txt:"
+                // 'dir' will list files; we expect newfile.txt to be missing
                 bat 'dir'
             }
         }
