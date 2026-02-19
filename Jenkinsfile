@@ -1,9 +1,11 @@
 pipeline {
     agent any
 
-    // Task 2: Define string parameter BUILD_NAME
+    // Defining multiple parameters to fulfill Task 3
     parameters {
-        string(name: 'BUILD_NAME', defaultValue: 'Build_v1.0', description: 'Task 2: Enter the name of this build')
+        string(name: 'BUILD_NAME', defaultValue: 'Release_1.0', description: 'Enter Build Name')
+        booleanParam(name: 'RUN_TEST', defaultValue: true, description: 'Run tests?')
+        choice(name: 'ENVIRONMENT', choices: ['DEV', 'TEST', 'PROD'], description: 'Select Environment')
     }
 
     stages {
@@ -11,27 +13,27 @@ pipeline {
         stage('Task 1: Checkout') {
             steps {
                 checkout scm
-                echo "Repository checkout complete."
             }
         }
 
-        // Task 3: Create a file with BUILD_NAME as its content
-        stage('Task 3: Create Build File') {
+        // Task 2: Display Jenkins workspace path using environment variable
+        stage('Task 2: Workspace Info') {
             steps {
-                script {
-                    // This BAT command creates a file named 'build_info.txt' 
-                    // and writes the BUILD_NAME into it.
-                    bat "echo ${params.BUILD_NAME} > build_info.txt"
-                    
-                    echo "File 'build_info.txt' has been created with content: ${params.BUILD_NAME}"
-                }
+                // 'WORKSPACE' is a built-in Jenkins environment variable
+                echo "The current Jenkins workspace is located at: ${env.WORKSPACE}"
+                
+                // Using BAT to show the directory path in the shell
+                bat "echo Current Directory: %WORKSPACE%"
             }
         }
 
-        stage('Verify File') {
+        // Task 3: Print all parameter values in console
+        stage('Task 3: Parameter Summary') {
             steps {
-                // Let's verify the file was actually created and show its content
-                bat "type build_info.txt"
+                echo "--- Summary of Parameters ---"
+                echo "Build Name: ${params.BUILD_NAME}"
+                echo "Run Test: ${params.RUN_TEST}"
+                echo "Selected Environment: ${params.ENVIRONMENT}"
             }
         }
     }
