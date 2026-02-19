@@ -1,33 +1,32 @@
 pipeline {
     agent any
 
-    // Task 2: Define Boolean, Choice, and String parameters
+    // Task 2: Define Choice parameter with DEV, TEST, PROD
     parameters {
-        booleanParam(name: 'RUN_TEST', defaultValue: true, description: 'Task 2: Check to execute the test stage')
-        choice(name: 'BROWSER', choices: ['Chrome', 'Firefox', 'Edge'], description: 'Select a browser for the test')
-        string(name: 'TEST_NAME', defaultValue: 'Smoke Test', description: 'Enter the name of the test')
+        choice(
+            name: 'ENVIRONMENT', 
+            choices: ['DEV', 'TEST', 'PROD'], 
+            description: 'Task 2: Select the target environment'
+        )
     }
 
     stages {
-        // Task 1: Checkout code from GitHub
+        // Task 1: Checkout updated repository version
         stage('Task 1: Checkout') {
             steps {
                 checkout scm
-                echo "Code checked out from: https://github.com/rithuLOQ/ToDo-List.git"
+                echo "Updated repository version checked out."
             }
         }
 
-        // Task 3: If RUN_TEST is true, execute BAT command
-        stage('Task 3: Execute Test') {
+        // Task 3: Print selected environment in console
+        stage('Task 3: Display Environment') {
             steps {
-                script {
-                    if (params.RUN_TEST) {
-                        // This executes the BAT command as per the objective
-                        bat "echo Running ${params.TEST_NAME} on ${params.BROWSER}"
-                    } else {
-                        echo 'Test stage was skipped because RUN_TEST is false.'
-                    }
-                }
+                // This prints the choice selected by the user
+                echo "The selected environment is: ${params.ENVIRONMENT}"
+                
+                // Using a BAT command to show it in the shell output
+                bat "echo DEPLOYING TO ${params.ENVIRONMENT} MODE"
             }
         }
     }
